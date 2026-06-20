@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>dev.portfolio — свяжитесь со мной</title>
+<style>
+  :root{
+    --bg: #11151c;
+    --panel: #161b24;
+    --gutter: #0c0f15;
+    --text: #e6e9ef;
+    --muted: #7b8496;
+    --accent: #5ee0c4;
+    --accent-dim: #2c4f48;
+    --error: #ff7a7a;
+    --font-mono: 'JetBrains Mono', 'Fira Code', Consolas, Menlo, monospace;
+  }
+  *{ box-sizing: border-box; }
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family: var(--font-mono);
+    line-height:1.6;
+  }
+  .titlebar{
+    display:flex; align-items:center; gap:8px;
+    padding:10px 18px; background:var(--gutter); border-bottom:1px solid #1f2530;
+  }
+  .dot{ width:11px; height:11px; border-radius:50%; }
+  .dot.red{ background:#ff5f57; } .dot.yellow{ background:#febc2e; } .dot.green{ background:#28c840; }
+  .titlebar span{ margin-left:14px; color:var(--muted); font-size:13px; }
+
+  .wrap{ max-width:780px; margin:0 auto; padding:48px 24px 80px; }
+
+  .eyebrow{ color:var(--accent); font-size:13px; letter-spacing:.08em; }
+  .eyebrow::before{ content:"// "; color:var(--muted); }
+  h1{
+    font-size:clamp(28px,5vw,42px); margin:10px 0 6px; font-weight:700;
+    letter-spacing:-0.02em;
+  }
+  h1 .cursor{ display:inline-block; width:10px; height:1em; background:var(--accent); margin-left:6px; animation:blink 1.1s step-end infinite; vertical-align:-2px;}
+  @keyframes blink{ 50%{ opacity:0; } }
+  p.lead{ color:var(--muted); max-width:560px; }
+
+  .panel{
+    background:var(--panel); border:1px solid #1f2530; border-radius:10px;
+    margin-top:34px; overflow:hidden;
+  }
+  .panel-head{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:12px 18px; border-bottom:1px solid #1f2530; color:var(--muted); font-size:13px;
+  }
+  form{ padding:22px; }
+  .field{ margin-bottom:18px; }
+  .field label{ display:block; font-size:13px; color:var(--muted); margin-bottom:6px; }
+  .field label .key{ color:var(--accent); }
+  .field input, .field textarea{
+    width:100%; background:var(--gutter); border:1px solid #232a36; border-radius:6px;
+    color:var(--text); font-family:var(--font-mono); font-size:14px; padding:11px 12px;
+    resize:vertical;
+  }
+  .field input:focus, .field textarea:focus{
+    outline:none; border-color:var(--accent);
+  }
+  .field .err{ color:var(--error); font-size:12.5px; margin-top:5px; min-height:1em; }
+
+  button{
+    background:var(--accent); color:#0b1410; border:none; border-radius:6px;
+    font-family:var(--font-mono); font-weight:700; font-size:14px;
+    padding:12px 22px; cursor:pointer; display:inline-flex; align-items:center; gap:8px;
+  }
+  button:disabled{ opacity:.6; cursor:default; }
+  button:hover:not(:disabled){ filter:brightness(1.08); }
+
+  .result{ margin-top:18px; padding:14px 16px; border-radius:8px; font-size:13.5px; display:none; white-space:pre-wrap; }
+  .result.ok{ display:block; background:#10241f; border:1px solid var(--accent-dim); color:#bdf3e6; }
+  .result.fail{ display:block; background:#2a1414; border:1px solid #4a2222; color:#ffb3b3; }
+
+  footer{ margin-top:50px; color:var(--muted); font-size:12.5px; }
+  footer code{ color:var(--accent); }
+</style>
+</head>
+<body>
+  <div class="titlebar">
+    <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+    <span>contact.tsx — dev.portfolio</span>
+  </div>
+
+  <div class="wrap">
+    <div class="eyebrow">backend developer</div>
+    <h1>Свяжитесь со мной<span class="cursor"></span></h1>
+    <p class="lead">
+      Заполните форму ниже — обращение пройдёт валидацию, будет проанализировано AI
+      (тональность и категория) и автоматически отправлено мне на почту, а вам придёт копия.
+    </p>
+
+    <div class="panel">
+      <div class="panel-head">
+        <span>POST /api/contact</span>
+        <span id="status-pill">●&nbsp;ready</span>
+      </div>
+      <form id="contact-form" novalidate>
+        <div class="field">
+          <label><span class="key">name</span>: string</label>
+          <input type="text" id="name" name="name" placeholder="Иван Иванов" required minlength="2">
+          <div class="err" id="err-name"></div>
+        </div>
+        <div class="field">
+          <label><span class="key">phone</span>: string</label>
+          <input type="text" id="phone" name="phone" placeholder="+998 90 123 45 67" required>
+          <div class="err" id="err-phone"></div>
+        </div>
+        <div class="field">
+          <label><span class="key">email</span>: string</label>
+          <input type="email" id="email" name="email" placeholder="ivan@example.com" required>
+          <div class="err" id="err-email"></div>
+        </div>
+        <div class="field">
+          <label><span class="key">comment</span>: string</label>
+          <textarea id="comment" name="comment" rows="5" placeholder="Расскажите о вашем проекте..." required minlength="5"></textarea>
+          <div class="err" id="err-comment"></div>
+        </div>
+        <button type="submit" id="submit-btn">send_request()</button>
+        <div class="result" id="result"></div>
+      </form>
+    </div>
+
+    <footer>
+      API base: <code id="api-base"></code> &middot; смотрите документацию на <code>/docs</code>
+    </footer>
+  </div>
+
+<script>
+  // Меняйте на адрес вашего задеплоенного API, если фронтенд раздаётся отдельно
+  const API_BASE = window.location.origin;
+  document.getElementById('api-base').textContent = API_BASE;
+
+  const form = document.getElementById('contact-form');
+  const btn = document.getElementById('submit-btn');
+  const resultBox = document.getElementById('result');
+  const pill = document.getElementById('status-pill');
+
+  function clearErrors(){
+    ['name','phone','email','comment'].forEach(f => {
+      document.getElementById('err-' + f).textContent = '';
+    });
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearErrors();
+    resultBox.className = 'result';
+    resultBox.textContent = '';
+
+    const payload = {
+      name: document.getElementById('name').value.trim(),
+      phone: document.getElementById('phone').value.trim(),
+      email: document.getElementById('email').value.trim(),
+      comment: document.getElementById('comment').value.trim(),
+    };
+
+    btn.disabled = true;
+    btn.textContent = 'sending...';
+    pill.textContent = '●  sending';
+
+    try {
+      const res = await fetch(`${API_BASE}/api/contact`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        resultBox.className = 'result ok';
+        resultBox.textContent =
+          `✓ ${data.message}\n\n` +
+          `request_id: ${data.request_id}\n` +
+          `ai.sentiment: ${data.ai_analysis.sentiment}\n` +
+          `ai.category: ${data.ai_analysis.category}\n` +
+          `ai.auto_reply: ${data.ai_analysis.auto_reply}\n` +
+          `owner_email_sent: ${data.owner_email_sent}\n` +
+          `user_email_sent: ${data.user_email_sent}`;
+        form.reset();
+        pill.textContent = '●  ready';
+      } else {
+        resultBox.className = 'result fail';
+        resultBox.textContent = `✗ ${data.error}\n${data.detail || ''}`;
+        pill.textContent = '●  error';
+      }
+    } catch (err) {
+      resultBox.className = 'result fail';
+      resultBox.textContent = `✗ network_error\n${err.message}`;
+      pill.textContent = '●  offline';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'send_request()';
+    }
+  });
+</script>
+</body>
+</html>

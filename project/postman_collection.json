@@ -1,0 +1,76 @@
+{
+  "info": {
+    "name": "Developer Landing Backend API",
+    "description": "Коллекция запросов для тестирования backend API лендинг-презентации разработчика.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8000" }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "{{base_url}}/api/health", "host": ["{{base_url}}"], "path": ["api", "health"] }
+      }
+    },
+    {
+      "name": "Metrics",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "{{base_url}}/api/metrics", "host": ["{{base_url}}"], "path": ["api", "metrics"] }
+      }
+    },
+    {
+      "name": "Contact - valid request",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Иван Иванов\",\n  \"phone\": \"+998901234567\",\n  \"email\": \"ivan@example.com\",\n  \"comment\": \"Здравствуйте! Хочу обсудить разработку backend для моего стартапа.\"\n}"
+        },
+        "url": { "raw": "{{base_url}}/api/contact", "host": ["{{base_url}}"], "path": ["api", "contact"] }
+      }
+    },
+    {
+      "name": "Contact - invalid email (422)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Иван\",\n  \"phone\": \"+998901234567\",\n  \"email\": \"not-an-email\",\n  \"comment\": \"Тестовое сообщение\"\n}"
+        },
+        "url": { "raw": "{{base_url}}/api/contact", "host": ["{{base_url}}"], "path": ["api", "contact"] }
+      }
+    },
+    {
+      "name": "Contact - missing fields (422)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Иван\"\n}"
+        },
+        "url": { "raw": "{{base_url}}/api/contact", "host": ["{{base_url}}"], "path": ["api", "contact"] }
+      }
+    },
+    {
+      "name": "Contact - negative comment (AI sentiment test)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Пётр Петров\",\n  \"phone\": \"+998901112233\",\n  \"email\": \"petr@example.com\",\n  \"comment\": \"Это ужасно, сайт не работает уже неделю, я очень недоволен!\"\n}"
+        },
+        "url": { "raw": "{{base_url}}/api/contact", "host": ["{{base_url}}"], "path": ["api", "contact"] }
+      }
+    }
+  ]
+}
